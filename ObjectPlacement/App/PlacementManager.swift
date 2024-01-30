@@ -13,6 +13,7 @@ import SwiftUI
 
 @Observable
 final class PlacementManager {
+    
     private let worldTracking = WorldTrackingProvider()
     private let planeDetection = PlaneDetectionProvider()
     
@@ -24,7 +25,7 @@ final class PlacementManager {
             persistenceManager.placeableObjectsByFileName = appState?.placeableObjectsByFileName ?? [:]
         }
     }
-    
+
     private var currentDrag: DragState? = nil {
         didSet {
             placementState.dragInProgress = currentDrag != nil
@@ -32,7 +33,7 @@ final class PlacementManager {
     }
     
     var placementState = PlacementState()
-    
+
     var rootEntity: Entity
     
     private let deviceLocation: Entity
@@ -42,8 +43,10 @@ final class PlacementManager {
     weak var dragTooltip: Entity? = nil
     weak var deleteButton: Entity? = nil
     
+    // Place objects on planes with a small gap.
     static private let placedObjectsOffsetOnPlanes: Float = 0.01
     
+    // Snap dragged objects to a nearby horizontal plane within +/- 4 centimeters.
     static private let snapToPlaneDistanceForDraggedObjects: Float = 0.04
     
     @MainActor
@@ -59,8 +62,10 @@ final class PlacementManager {
         persistenceManager.loadPersistedObjects()
         
         rootEntity.addChild(placementLocation)
+        
         deviceLocation.addChild(raycastOrigin)
         
+        // Angle raycasts 15 degrees down.
         let raycastDownwardAngle = 15.0 * (Float.pi / 180)
         raycastOrigin.orientation = simd_quatf(angle: -raycastDownwardAngle, axis: [1.0, 0.0, 0.0])
     }
@@ -72,6 +77,9 @@ final class PlacementManager {
     @MainActor
     func addPlacementTooltip(_ tooltip: Entity) {
         placementTooltip = tooltip
+        
+        // Add a tooltip 10 centimeters in front of the placement location to give
+        // users feedback about why they can’t currently place an object.
         placementLocation.addChild(tooltip)
         tooltip.position = [0.0, 0.05, 0.1]
     }
@@ -81,12 +89,15 @@ final class PlacementManager {
             await persistenceManager.removeObject(highlightedObject)
         }
     }
-    
+
     @MainActor
     func runARKitSession() async {
         do {
+            // Run a new set of providers every time when entering the immersive space.
             try await appState!.arkitSession.run([worldTracking, planeDetection])
         } catch {
+            // No need to handle the error here; the app is already monitoring the
+            // session for error.
             return
         }
         
@@ -94,48 +105,46 @@ final class PlacementManager {
             select(object)
         }
     }
-    
+
     @MainActor
     func collisionBegan(_ event: CollisionEvents.Began) {
-        guard let selectedObject = placementState.selectedObject else {
-            return
-        }
-        guard selectedObject.matchesCollisionEvent(event: event) else {
-            return
-        }
+        guard let selectedObject = placementState.selectedObject else { return }
+        guard selectedObject.matchesCollisionEvent(event: event) else { return }
+
         placementState.activeCollisions += 1
     }
     
     @MainActor
     func collisionEnded(_ event: CollisionEvents.Ended) {
-        guard let selectedObject = placementState.selectedObject else {
-            return
-        }
-        guard selectedObject.matchesCollisionEvent(event: event) else {
-            return
-        }
+        guard let selectedObject = placementState.selectedObject else { return }
+        guard selectedObject.matchesCollisionEvent(event: event) else { return }
         guard placementState.activeCollisions > 0 else {
             print("Received a collision ended event without a corresponding collision start event.")
             return
         }
+
         placementState.activeCollisions -= 1
     }
     
     @MainActor
     func select(_ object: PlaceableObject?) {
         if let oldSelection = placementState.selectedObject {
+            // Remove the current preview entity.
             placementLocation.removeChild(oldSelection.previewEntity)
-            
+
+            // Handle deselection. Selecting the same object again in the app deselects it.
             if oldSelection.descriptor.fileName == object?.descriptor.fileName {
                 select(nil)
                 return
             }
         }
         
+        // Update state.
         placementState.selectedObject = object
         appState?.selectedFileName = object?.descriptor.fileName
         
         if let object {
+            // Add new preview entity.
             placementLocation.addChild(object.previewEntity)
         }
     }
@@ -172,12 +181,15 @@ final class PlacementManager {
     
     @MainActor
     private func updateUserFacingUIOrientations(_ deviceAnchor: DeviceAnchor) async {
+        // 1. Orient the front side of the highlighted object’s UI to face the user.
         if let uiOrigin = placementState.highlightedObject?.uiOrigin {
+            // Set the UI to face the user (on the y-axis only).
             uiOrigin.look(at: deviceAnchor.originFromAnchorTransform.translation)
             let uiRotationOnYAxis = uiOrigin.transformMatrix(relativeTo: nil).gravityAligned.rotation
             uiOrigin.setOrientation(uiRotationOnYAxis, relativeTo: nil)
         }
         
+        // 2. Orient each UI element to face the user.
         for entity in [placementTooltip, dragTooltip, deleteButton] {
             if let entity {
                 entity.look(at: deviceAnchor.originFromAnchorTransform.translation)
@@ -190,15 +202,25 @@ final class PlacementManager {
         deviceLocation.transform = Transform(matrix: deviceAnchor.originFromAnchorTransform)
         let originFromUprightDeviceAnchorTransform = deviceAnchor.originFromAnchorTransform.gravityAligned
         
+        // Determine a placement location on planes in front of the device by casting a ray.
+        
+        // Cast the ray from the device origin.
         let origin: SIMD3<Float> = raycastOrigin.transformMatrix(relativeTo: nil).translation
+    
+        // Cast the ray along the negative z-axis of the device anchor, but with a slight downward angle.
+        // (The downward angle is configurable using the `raycastOrigin` orientation.)
         let direction: SIMD3<Float> = -raycastOrigin.transformMatrix(relativeTo: nil).zAxis
+        
+        // Only consider raycast results that are within 0.2 to 3 meters from the device.
         let minDistance: Float = 0.2
         let maxDistance: Float = 3
         
+        // Only raycast against horizontal planes.
         let collisionMask = PlaneAnchor.allPlanesCollisionGroup
+
         var originFromPointOnPlaneTransform: float4x4? = nil
         if let result = rootEntity.scene?.raycast(origin: origin, direction: direction, length: maxDistance, query: .nearest, mask: collisionMask)
-            .first, result.distance > minDistance {
+                                                  .first, result.distance > minDistance {
             if result.entity.components[CollisionComponent.self]?.filter.group != PlaneAnchor.verticalCollisionGroup {
                 // If the raycast hit a horizontal plane, use that result with a small, fixed offset.
                 originFromPointOnPlaneTransform = originFromUprightDeviceAnchorTransform
@@ -245,27 +267,27 @@ final class PlacementManager {
             return
         }
         placementState.highlightedObject = objectToHighlight
-        
+
         // Detach UI from the previously highlighted object.
         guard let deleteButton, let dragTooltip else { return }
         deleteButton.removeFromParent()
         dragTooltip.removeFromParent()
-        
+
         guard let objectToHighlight else { return }
-        
+
         // Position and attach the UI to the newly highlighted object.
         let extents = objectToHighlight.extents
         let topLeftCorner: SIMD3<Float> = [-extents.x / 2, (extents.y / 2) + 0.02, 0]
         let frontBottomCenter: SIMD3<Float> = [0, (-extents.y / 2) + 0.04, extents.z / 2 + 0.04]
         deleteButton.position = topLeftCorner
         dragTooltip.position = frontBottomCenter
-        
+
         objectToHighlight.uiOrigin.addChild(deleteButton)
         deleteButton.scale = 1 / objectToHighlight.scale
         objectToHighlight.uiOrigin.addChild(dragTooltip)
         dragTooltip.scale = 1 / objectToHighlight.scale
     }
-    
+
     func removeAllPlacedObjects() async {
         await persistenceManager.removeAllPlacedObjects()
     }
@@ -280,7 +302,7 @@ final class PlacementManager {
     func placeSelectedObject() {
         // Ensure there’s a placeable object.
         guard let objectToPlace = placementState.objectToPlace else { return }
-        
+
         let object = objectToPlace.materialize()
         object.position = placementLocation.position
         object.orientation = placementLocation.orientation
@@ -330,7 +352,7 @@ final class PlacementManager {
         // Update the dragged object’s position.
         if let currentDrag {
             currentDrag.draggedObject.position = currentDrag.initialPosition + value.convert(value.translation3D, from: .local, to: rootEntity)
-            
+
             // If possible, snap the dragged object to a nearby horizontal plane.
             let maxDistance = PlacementManager.snapToPlaneDistanceForDraggedObjects
             if let projectedTransform = PlaneProjector.project(point: currentDrag.draggedObject.transform.matrix,

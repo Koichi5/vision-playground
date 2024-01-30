@@ -12,7 +12,7 @@ import RealityKit
 // メインスレッド外でこの関数を呼び出す場合は非同期処理にする必要がある
 @MainActor
 @Observable
-final class ModeLoader {
+final class ModelLoader {
     private var didStartLoading = false
     private(set) var progress: Float = 0.0
     private(set) var placeableObjects = [PlaceableObject]()
@@ -48,10 +48,10 @@ final class ModeLoader {
         
         var usdzFiles: [String] = []
         if let resourcesPath = Bundle.main.resourcePath {
-            try? usdzFiles = FileManager.default.contentsOfDirectory(atPath: resourcesPath).filter {$0.hasSuffix(".usdz")}
+            try? usdzFiles = FileManager.default.contentsOfDirectory(atPath: resourcesPath).filter { $0.hasSuffix(".usdz") }
         }
         
-        assert(!usdzFiles.isEmpty, "Add USDZ files to the '3DModels' group of this project.")
+        assert(!usdzFiles.isEmpty, "Add USDZ files to the '3D models' group of this Xcode project.")
         
         fileCount = usdzFiles.count
         await withTaskGroup(of: (Void.self)) { group in
@@ -69,24 +69,29 @@ final class ModeLoader {
         var modelEntity: ModelEntity
         var previewEntity: Entity
         do {
+            // Load the USDZ as a ModelEntity.
             try await modelEntity = ModelEntity(named: fileName)
+            
+            // Load the USDZ as a regular Entity for previews.
             try await previewEntity = Entity(named: fileName)
             previewEntity.name = "Preview of \(modelEntity.name)"
         } catch {
             fatalError("Failed to load model \(fileName)")
         }
-        
+
+        // Set a collision component for the model so the app can detect whether the preview overlaps with existing placed objects.
         do {
             let shape = try await ShapeResource.generateConvex(from: modelEntity.model!.mesh)
-            // オブジェクトの衝突に関して、衝突できる要素をフィルターで選択
-            previewEntity.components.set(CollisionComponent(shapes: [shape], isStatic: false, filter: CollisionFilter(group: PlaceableObject.previewCollisionGroup, mask: .all)))
-            
+            previewEntity.components.set(CollisionComponent(shapes: [shape], isStatic: false,
+                                                            filter: CollisionFilter(group: PlaceableObject.previewCollisionGroup, mask: .all)))
+
+            // Ensure the preview only accepts indirect input (for tap gestures).
             let previewInput = InputTargetComponent(allowedInputTypes: [.indirect])
             previewEntity.components[InputTargetComponent.self] = previewInput
         } catch {
             fatalError("Failed to generate shape resource for model \(fileName)")
         }
-        
+
         let descriptor = ModelDescriptor(fileName: fileName, displayName: modelEntity.displayName)
         placeableObjects.append(PlaceableObject(descriptor: descriptor, renderContent: modelEntity, previewEntity: previewEntity))
     }

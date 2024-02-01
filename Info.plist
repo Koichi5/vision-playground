@@ -13,5 +13,7 @@
 		<key>UISceneConfigurations</key>
 		<dict/>
 	</dict>
+	<key>UISceneSessionRoleImmersiveSpaceApplication</key>
+	<string>UIApplicationPreferredDefaultSceneSessionRole</string>
 </dict>
 </plist>

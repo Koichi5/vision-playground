@@ -73,17 +73,65 @@ import SwiftUI
 //}
 
 // for ImmersiveSpaceSample
+//import SwiftUI
+//
+//@main
+//struct VisionPlaygroundApp: App {
+//    var body: some Scene {
+//        WindowGroup {
+//            ImmersiveSpaceSampleContentView()
+//        }
+//
+//        ImmersiveSpace(id: "ImmersiveSpace") {
+//            ImmersiveSpaceSampleImmersiveView()
+//        }.immersionStyle(selection: .constant(.full), in: .full)
+//    }
+//}
+
+// for Diorama
 import SwiftUI
+import RealityKitContent
+import ARKit
+import RealityKit
 
 @main
 struct VisionPlaygroundApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ImmersiveSpaceSampleContentView()
-        }
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    private let immersiveSpaceIdentifier = "Immersive"
+    
+    @State private var viewModel = DioramaViewModel()
 
-        ImmersiveSpace(id: "ImmersiveSpace") {
-            ImmersiveSpaceSampleImmersiveView()
-        }.immersionStyle(selection: .constant(.full), in: .full)
+    init() {
+        RealityKitContent.PointOfInterestComponent.registerComponent()
+        PointOfInterestRuntimeComponent.registerComponent()
+        RealityKitContent.TrailComponent.registerComponent()
+        RealityKitContent.BillboardComponent.registerComponent()
+        ControlledOpacityComponent.registerComponent()
+        RealityKitContent.RegionSpecificComponent.registerComponent()
+        
+        RealityKitContent.BillboardSystem.registerSystem()
+        RealityKitContent.TrailAnimationSystem.registerSystem()
+
+        FlockingComponent.registerComponent()
+        FlockingSystem.registerSystem()
+    }
+    
+    var body: some SwiftUI.Scene {
+
+        WindowGroup {
+            DioramaContentView(spaceId: immersiveSpaceIdentifier,
+                        viewModel: viewModel)
+        }
+        .windowStyle(.plain)
+
+        ImmersiveSpace(id: immersiveSpaceIdentifier) {
+            DioramaView(viewModel: viewModel)
+        }
+    }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: UIApplication) -> Bool {
+        return true
     }
 }

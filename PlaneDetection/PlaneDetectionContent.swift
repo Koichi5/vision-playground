@@ -1,15 +1,15 @@
 //
-//  ContentView.swift
+//  PlaneDetectionContent.swift
 //  VisionPlayground
 //
-//  Created by Koichi Kishimoto on 2024/01/28.
+//  Created by Koichi Kishimoto on 2024/02/16.
 //
 
 import SwiftUI
 import RealityKit
 import RealityKitContent
 
-struct ContentView: View {
+struct PlaneDetectionContent: View {
 
     @State private var showImmersiveSpace = false
     @State private var immersiveSpaceIsShown = false
@@ -24,7 +24,7 @@ struct ContentView: View {
 
             Text("Hello, world!")
 
-            Toggle("Show Immersive Space", isOn: $showImmersiveSpace)
+            Toggle("Plane Detection", isOn: $showImmersiveSpace)
                 .toggleStyle(.button)
                 .padding(.top, 50)
         }
@@ -32,7 +32,7 @@ struct ContentView: View {
         .onChange(of: showImmersiveSpace) { _, newValue in
             Task {
                 if newValue {
-                    switch await openImmersiveSpace(id: "ImmersiveSpace") {
+                    switch await openImmersiveSpace(id: "PlaneDetection") {
                     case .opened:
                         immersiveSpaceIsShown = true
                     case .error, .userCancelled:
@@ -50,6 +50,6 @@ struct ContentView: View {
     }
 }
 
-#Preview(windowStyle: .automatic) {
-    ContentView()
+#Preview {
+    PlaneDetectionContent()
 }

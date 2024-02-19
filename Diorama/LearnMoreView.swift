@@ -14,7 +14,7 @@ public struct LearnMoreView: View {
     let name: String
     let description: String
     let imageNames: [String]
-    let trial: Entity?
+    let trail: Entity?
     
     let viewModel: DioramaViewModel
     
@@ -69,9 +69,9 @@ public struct LearnMoreView: View {
                 withAnimation(.spring) {
                     showingMoreInfo.toggle()
                     
-                    if var trialOpacity = trial?.components[ControlledOpacityComponent.self] {
+                    if var trialOpacity = trail?.components[ControlledOpacityComponent.self] {
                         trialOpacity.shouldShow = showingMoreInfo
-                        trial?.components.set(trialOpacity)
+                        trail?.components.set(trialOpacity)
                     }
                     
                     viewModel.updateRegionSpecificOpacity()
@@ -106,7 +106,7 @@ struct ImagesView: View {
         }
     } attachments: {
         Attachment(id: "z") {
-            LearnMoreView(name: "Phoenix Lake", description: "Lake · Northern California", imageNames: ["Landscape_2_Sunset"], trial: nil, viewModel: DioramaViewModel())
+            LearnMoreView(name: "Phoenix Lake", description: "Lake · Northern California", imageNames: ["Landscape_2_Sunset"], trail: nil, viewModel: DioramaViewModel())
         }
     }
 }

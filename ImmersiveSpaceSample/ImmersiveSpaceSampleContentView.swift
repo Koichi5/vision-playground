@@ -22,7 +22,7 @@ struct ImmersiveSpaceSampleContentView: View {
 
     var body: some View {
        VStack {
-           Model3D(named: "Scene", bundle: realityKitContentBundle)
+           Model3D(named: "Scene", bundle: RealityKitContentBundle)
            .padding(.bottom, 50)
 
            Text(message)

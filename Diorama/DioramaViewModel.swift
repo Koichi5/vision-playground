@@ -85,7 +85,7 @@ final class DioramaViewModel {
                 guard let resource = try? AudioFileResource.load(
                     named: primPath,
                     from: "DioramaAssembled.usda",
-                    in: RealityKitContent.realityKitContentBundle) else { return }
+                    in: RealityKitContent.RealityKitContentBundle) else { return }
                 let audioPlaybackController = audioEmitter.prepareAudio(resource)
                 
                 audioPlaybackController.play()

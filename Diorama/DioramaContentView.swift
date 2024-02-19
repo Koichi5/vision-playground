@@ -11,7 +11,7 @@ import RealityKit
 struct DioramaContentView: View {
     let spaceId: String
     var viewModel: DioramaViewModel
-    
+
     @Environment(\.openImmersiveSpace) var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
@@ -21,6 +21,7 @@ struct DioramaContentView: View {
     
     var body: some View {
         @Bindable var viewModel = viewModel
+
         VStack {
             Spacer()
             Grid(alignment: .leading, verticalSpacing: 30) {
@@ -30,43 +31,47 @@ struct DioramaContentView: View {
                 .onChange(of: viewModel.showImmersiveContent) {
                     Task {
                         if viewModel.showImmersiveContent {
-                            if viewModel.showImmersiveContent {
-                                viewModel.resetAudio()
-                                await openImmersiveSpace(id: spaceId)
-                            } else {
-                                await dismissImmersiveSpace()
-                            }
+                            viewModel.resetAudio()
+                            await openImmersiveSpace(id: spaceId)
+                        } else {
+                            await dismissImmersiveSpace()
                         }
                     }
-                    
-                    GridRow {
-                        Text("Morph")
-                        Slider(value: $viewModel.sliderValue, in: (0.0)...(1.0))
-                            .onChange(of: viewModel.sliderValue) { _, _ in
-                                update()
-                            }
-                    }
-                    .disabled(!areControlsShowing)
-                    .opacity(areControlsShowing ? 1 : 0.5)
-                    
-                    GridRow {
-                        Text("Scale")
-                        Slider(value: $viewModel.contentScaleSliderValue)
-                            .onChange(of: viewModel.contentScaleSliderValue) { _, _ in
-                                viewModel.updateScale()
-                            }
-                    }
-                    .disabled(!areControlsShowing)
-                    .opacity(areControlsShowing ? 1 : 0.5)
                 }
-                .animation(.default, value: areControlsShowing)
-                .frame(width: 500)
-                .padding(30)
-                .glassBackgroundEffect()
+                
+                GridRow {
+                    Text("Morph")
+                    Slider(value: $viewModel.sliderValue, in: (0.0)...(1.0))
+                        .onChange(of: viewModel.sliderValue) { _, _ in
+                            update()
+                        }
+                        .onAppear {
+                            if let value = viewModel.terrainMaterialValue {
+                                viewModel.sliderValue = value
+                            }
+                            update()
+                        }
+                }
+                .disabled(!areControlsShowing)
+                .opacity(areControlsShowing ? 1 : 0.5)
+
+                GridRow {
+                    Text("Scale")
+                    Slider(value: $viewModel.contentScaleSliderValue)
+                        .onChange(of: viewModel.contentScaleSliderValue) { _, _ in
+                            viewModel.updateScale()
+                        }
+                }
+                .disabled(!areControlsShowing)
+                .opacity(areControlsShowing ? 1 : 0.5)
             }
+            .animation(.default, value: areControlsShowing)
+            .frame(width: 500)
+            .padding(30)
+            .glassBackgroundEffect()
         }
     }
-    
+
     private func update() {
         viewModel.updateTerrainMaterial()
         viewModel.updateRegionSpecificOpacity()

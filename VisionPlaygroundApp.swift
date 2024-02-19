@@ -89,49 +89,66 @@ import SwiftUI
 //}
 
 // for Diorama
+//import SwiftUI
+//import RealityKitContent
+//import ARKit
+//import RealityKit
+//
+//@main
+//struct VisionPlaygroundApp: App {
+//    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+//    private let immersiveSpaceIdentifier = "Immersive"
+//    
+//    @State private var viewModel = DioramaViewModel()
+//
+//    init() {
+//        RealityKitContent.PointOfInterestComponent.registerComponent()
+//        PointOfInterestRuntimeComponent.registerComponent()
+//        RealityKitContent.TrailComponent.registerComponent()
+//        RealityKitContent.BillboardComponent.registerComponent()
+//        ControlledOpacityComponent.registerComponent()
+//        RealityKitContent.RegionSpecificComponent.registerComponent()
+//        
+//        RealityKitContent.BillboardSystem.registerSystem()
+//        RealityKitContent.TrailAnimationSystem.registerSystem()
+//
+//        FlockingComponent.registerComponent()
+//        FlockingSystem.registerSystem()
+//    }
+//    
+//    var body: some SwiftUI.Scene {
+//
+//        WindowGroup {
+//            DioramaContentView(spaceId: immersiveSpaceIdentifier,
+//                        viewModel: viewModel)
+//        }
+//        .windowStyle(.plain)
+//
+//        ImmersiveSpace(id: immersiveSpaceIdentifier) {
+//            DioramaView(viewModel: viewModel)
+//        }
+//    }
+//}
+//
+//class AppDelegate: NSObject, UIApplicationDelegate {
+//    func applicationShouldTerminateAfterLastWindowClosed(_ sender: UIApplication) -> Bool {
+//        return true
+//    }
+//}
+
+// for PlaneDetection
 import SwiftUI
-import RealityKitContent
-import ARKit
-import RealityKit
 
 @main
 struct VisionPlaygroundApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    private let immersiveSpaceIdentifier = "Immersive"
-    
-    @State private var viewModel = DioramaViewModel()
-
-    init() {
-        RealityKitContent.PointOfInterestComponent.registerComponent()
-        PointOfInterestRuntimeComponent.registerComponent()
-        RealityKitContent.TrailComponent.registerComponent()
-        RealityKitContent.BillboardComponent.registerComponent()
-        ControlledOpacityComponent.registerComponent()
-        RealityKitContent.RegionSpecificComponent.registerComponent()
-        
-        RealityKitContent.BillboardSystem.registerSystem()
-        RealityKitContent.TrailAnimationSystem.registerSystem()
-
-        FlockingComponent.registerComponent()
-        FlockingSystem.registerSystem()
-    }
-    
-    var body: some SwiftUI.Scene {
-
+    var body: some Scene {
         WindowGroup {
-            DioramaContentView(spaceId: immersiveSpaceIdentifier,
-                        viewModel: viewModel)
+            PlaneDetectionContent()
         }
-        .windowStyle(.plain)
-
-        ImmersiveSpace(id: immersiveSpaceIdentifier) {
-            DioramaView(viewModel: viewModel)
+        
+        ImmersiveSpace(id: "PlaneDetection") {
+            PlaneDetectionView()
         }
-    }
-}
-
-class AppDelegate: NSObject, UIApplicationDelegate {
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: UIApplication) -> Bool {
-        return true
+//        .immersionStyle(in: ImmersionStyle.mixed)
     }
 }

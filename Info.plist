@@ -6,12 +6,12 @@
 	<string>Scan your environment to allow accurate object placement.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
-		<key>UIApplicationPreferredDefaultSceneSessionRole</key>
-		<string>UIWindowSceneSessionRoleApplication</string>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<true/>
 		<key>UISceneConfigurations</key>
 		<dict/>
+		<key>UIApplicationPreferredDefaultSceneSessionRole</key>
+		<string>UISceneSessionRoleImmersiveSpaceApplication</string>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
 	</dict>
 	<key>UISceneSessionRoleImmersiveSpaceApplication</key>
 	<string>UIApplicationPreferredDefaultSceneSessionRole</string>

@@ -137,18 +137,18 @@ import SwiftUI
 //}
 
 // for PlaneDetection
-import SwiftUI
-
-@main
-struct VisionPlaygroundApp: App {
-    var body: some Scene {
-        WindowGroup {
-            PlaneDetectionContent()
-        }
-        
-        ImmersiveSpace(id: "PlaneDetection") {
-            PlaneDetectionView()
-        }
-//        .immersionStyle(in: ImmersionStyle.mixed)
-    }
-}
+//import SwiftUI
+//
+//@main
+//struct VisionPlaygroundApp: App {
+//    var body: some Scene {
+//        WindowGroup {
+//            PlaneDetectionContent()
+//        }
+//        
+//        ImmersiveSpace(id: "PlaneDetection") {
+//            PlaneDetectionView()
+//        }
+////        .immersionStyle(in: ImmersionStyle.mixed)
+//    }
+//}

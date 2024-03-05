@@ -8,7 +8,7 @@
 import SwiftUI
 import RealityKit
 
-@main
+//@main
 struct Day4App: App {
     
     @StateObject var model = Day4ViewModel()

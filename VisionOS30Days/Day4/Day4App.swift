@@ -19,6 +19,7 @@ struct Day4App: App {
                 content.add(model.setupContentEntity())
             }
             .task {
+                print("day4 app task fired")
                 await model.runSession()
             }
         }

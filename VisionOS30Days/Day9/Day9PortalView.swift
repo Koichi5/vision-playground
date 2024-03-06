@@ -23,15 +23,25 @@ struct Day9PortalView: View {
         let world = Entity()
         world.components[WorldComponent.self] = .init()
         
+//        // Add Light
 //        let environment = try! EnvironmentResource.load(named: "Sunlight")
 //        world.components[ImageBasedLightComponent.self] = .init(source: .single(environment), intensityExponent: 12)
 //        world.components[ImageBasedLightReceiverComponent.self] = .init(imageBasedLight: world)
         
-        guard let earth = try? ModelEntity.load(named: "Earth", in: RealityKitContentBundle) else { fatalError("No entity found") }
+        // Earth
+        guard let earth = try? ModelEntity.load(named: "Earth", in: RealityKitContentBundle) else { fatalError("No earth entity found") }
         earth.position = SIMD3<Float>(x: -0.1, y: 0, z: -0.4)
         world.addChild(earth)
-        
         return world
+        
+//        // Plane
+//        guard let plane = try? ModelEntity.load(named: "PlaneScene", in: RealityKitContentBundle) else {
+//            fatalError("No plane entity found")
+//        }
+//        let animation = plane.availableAnimations.first
+//        plane.playAnimation((animation?.repeat())!)
+//        world.addChild(plane)
+//        return plane
     }
     
     func makePortal(world: Entity) -> Entity {

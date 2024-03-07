@@ -8,7 +8,7 @@
 import SwiftUI
 
 // On Info file:  Preferred Default Scene Session Role: Volumetric Window Application Session Role
-@main
+//@main
 struct Day9App: App {
     var body: some Scene {
         WindowGroup {

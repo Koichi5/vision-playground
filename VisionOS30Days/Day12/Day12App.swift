@@ -1,0 +1,17 @@
+//
+//  Day12App.swift
+//  VisionPlayground
+//
+//  Created by Koichi Kishimoto on 2024/03/07.
+//
+
+import SwiftUI
+
+@main
+struct Day12App: App {
+    var body: some Scene {
+        WindowGroup {
+            Day12ContentView()
+        }
+    }
+}

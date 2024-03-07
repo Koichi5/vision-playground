@@ -9,7 +9,7 @@
 		<key>UISceneConfigurations</key>
 		<dict/>
 		<key>UIApplicationPreferredDefaultSceneSessionRole</key>
-		<string>UIWindowSceneSessionRoleVolumetricApplication</string>
+		<string>UIWindowSceneSessionRoleApplication</string>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<true/>
 	</dict>

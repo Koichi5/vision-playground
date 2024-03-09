@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@main
+//@main
 struct Day17App: App {
     @State private var viewModel = Day17ViewModel()
     

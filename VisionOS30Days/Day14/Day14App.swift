@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// progressive and full view app
 //@main
 struct Day14App: App {
     var body: some Scene {

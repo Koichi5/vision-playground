@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// ornament app
 //@main
 struct Day17App: App {
     @State private var viewModel = Day17ViewModel()

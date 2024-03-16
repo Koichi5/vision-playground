@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// drag and drop
 //@main
 struct Day25App: App {
     

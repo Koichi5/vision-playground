@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// immersive 360 video app
 //@main
 struct Day24App: App {
     

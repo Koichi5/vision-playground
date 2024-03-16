@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// image board app
 // Preferred Default Scene Session Role: Window Application Session Role
 //@main
 struct Day10App: App {

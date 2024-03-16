@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// drag and drop app
 //@main
 struct Day6App: App {
     var body: some Scene {

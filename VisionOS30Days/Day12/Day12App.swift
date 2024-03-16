@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// 2d map app
 //@main
 struct Day12App: App {
     var body: some Scene {

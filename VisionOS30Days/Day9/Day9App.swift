@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// portal app
 // On Info file:  Preferred Default Scene Session Role: Volumetric Window Application Session Role
 //@main
 struct Day9App: App {

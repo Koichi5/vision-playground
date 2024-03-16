@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// swiftui view in immersive space
 @main
 struct Day27App: App {
     

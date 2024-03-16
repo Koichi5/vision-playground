@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// immersive look around app
 //@main
 struct Day21App: App {
     
